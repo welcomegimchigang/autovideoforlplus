@@ -1,0 +1,47 @@
+# Dependencies
+/node_modules
+/.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# Testing
+/coverage
+
+# Next.js build output
+/.next/
+/out/
+
+# Production
+/build
+/dist
+
+# Environment variables
+.env
+.env*.local
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Generated media and scratch files
+/public/generated-audios/*
+!/public/generated-audios/.gitkeep
+/scratch/*
+!/scratch/.gitkeep
+
+# System & debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+*.log
+
+# IDE & OS files
+.DS_Store
+*.pem
+.vscode/
+.idea/
+.system_generated/
+
+# Vercel
+.vercel
