@@ -26,7 +26,13 @@ const memoryEpisodes = globalStore.__memoryEpisodes;
 const memoryCuts = globalStore.__memoryCuts;
 
 export function getCharacterAssets(): CharacterAssets {
-  return globalStore.__characterAssets || { plue: null, beom: null, custom: [] };
+  if (!globalStore.__characterAssets) {
+    globalStore.__characterAssets = { plue: null, beom: null, custom: [] };
+  }
+  if (!Array.isArray(globalStore.__characterAssets.custom)) {
+    globalStore.__characterAssets.custom = [];
+  }
+  return globalStore.__characterAssets;
 }
 
 export async function fetchCharacterAssetsFromDB(): Promise<CharacterAssets> {
