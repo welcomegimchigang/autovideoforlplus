@@ -254,8 +254,9 @@ export default function AdminPage() {
         <CharacterAssetBar
           assets={characterAssets}
           onAssetUpdated={(type, url) => {
-            setCharacterAssets((prev) => ({ ...prev, [type]: url }));
+            fetchCharacterAssets();
           }}
+          onRefresh={fetchCharacterAssets}
         />
 
         {/* 파이프라인 진행 상태 및 컨트롤 바 */}

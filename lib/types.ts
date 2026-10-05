@@ -20,10 +20,20 @@ export interface Episode {
   created_at: string;
 }
 
+export interface CharacterItem {
+  id: string;
+  name: string;
+  desc?: string;
+  emoji?: string;
+  url: string | null;
+  isFixed?: boolean;
+}
+
 export interface CharacterAssets {
   plue: string | null;
   beom: string | null;
-  flashback: string | null;
+  custom?: CharacterItem[];
+  [key: string]: any;
 }
 
 export interface Cut {

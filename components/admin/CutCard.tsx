@@ -127,9 +127,16 @@ export const CutCard: React.FC<Props> = ({
         </span>
       );
     }
+    if (!speaker || speaker === 'none') {
+      return (
+        <span className="px-2 py-0.5 rounded text-[11px] font-black bg-slate-800 text-slate-400">
+          무음 / 내레이션
+        </span>
+      );
+    }
     return (
-      <span className="px-2 py-0.5 rounded text-[11px] font-black bg-slate-800 text-slate-400">
-        무음 / 내레이션
+      <span className="px-2 py-0.5 rounded text-[11px] font-black bg-amber-500/20 text-amber-300 border border-amber-500/40">
+        ✨ {speaker}
       </span>
     );
   };

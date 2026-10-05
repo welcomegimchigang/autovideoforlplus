@@ -26,11 +26,11 @@ const CLAUDE_SYSTEM_PROMPT = `
 
 [컷 생성 규칙]
 - 각 컷의 duration_target은 보통 3.5초~5.0초입니다. (대사가 길면 5~7초).
-- speaker: 'plue' | 'beom' | 'none'
+- speaker: 'plue' | 'beom' | 'none' 또는 추가 등장인물 이름 (예: 'eoheung', '어흥이' 등)
 - type: 'video' | 'still' | 'edit'
 - 대화(티키타카) 씬 규칙:
-  * 플루와 범이 서로 대화하는 장면은 한 컷에 대사를 합치지 말고, 발화자 턴(Turn) 단위로 컷을 1:1 분할(Shot-Reverse-Shot)하십시오.
-  * 범이 말할 때는 speaker: 'beom'과 범의 비주얼 프롬프트, 플루가 받아칠 때는 speaker: 'plue'와 플루의 비주얼 프롬프트를 배정하여 티키타카가 살아나도록 연출하십시오.
+  * 등장인물들이 서로 대화하는 장면은 한 컷에 대사를 합치지 말고, 발화자 턴(Turn) 단위로 컷을 1:1 분할(Shot-Reverse-Shot)하십시오.
+  * 말하는 캐릭터의 speaker와 해당 캐릭터의 비주얼 프롬프트를 배정하여 티키타카가 살아나도록 연출하십시오.
 
 [출력 형식]
 반드시 유효한 JSON 객체만 반환하십시오. 마크다운 백틱(\`\`\`json)이나 다른 설명글을 일절 포함하지 마십시오:

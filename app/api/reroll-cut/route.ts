@@ -63,12 +63,27 @@ export async function POST(request: NextRequest) {
       const characterAssets = getCharacterAssets();
       let referenceImageUrl: string | undefined = targetCut.image_url || undefined;
       if (!referenceImageUrl) {
-        if (targetCut.is_flashback && characterAssets.flashback) {
-          referenceImageUrl = characterAssets.flashback;
-        } else if (targetCut.speaker === 'plue' && characterAssets.plue) {
+        const speaker = targetCut.speaker?.toLowerCase();
+        if (speaker === 'plue' && characterAssets.plue) {
           referenceImageUrl = characterAssets.plue;
-        } else if (targetCut.speaker === 'beom' && characterAssets.beom) {
+        } else if (speaker === 'beom' && characterAssets.beom) {
           referenceImageUrl = characterAssets.beom;
+        } else if (characterAssets.custom && characterAssets.custom.length > 0) {
+          const matched = characterAssets.custom.find(
+            (c) =>
+              c.id.toLowerCase() === speaker ||
+              c.name.toLowerCase() === speaker ||
+              (c.name && targetCut.script_text?.includes(c.name)) ||
+              (c.name && targetCut.visual_prompt?.includes(c.name)) ||
+              (c.id && targetCut.visual_prompt?.toLowerCase().includes(c.id.toLowerCase()))
+          );
+          if (matched && matched.url) {
+            referenceImageUrl = matched.url;
+          }
+        }
+
+        if (!referenceImageUrl && characterAssets.plue) {
+          referenceImageUrl = characterAssets.plue;
         }
       }
 

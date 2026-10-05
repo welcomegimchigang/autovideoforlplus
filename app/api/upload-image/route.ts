@@ -27,8 +27,26 @@ export async function POST(request: NextRequest) {
     const publicUrl = await uploadImageToStorage(buffer, fileName, file.type || 'image/png');
 
     // 2. 캐릭터 전역 에셋으로 지정된 경우 저장
-    if (characterType && (characterType === 'plue' || characterType === 'beom' || characterType === 'flashback')) {
-      saveCharacterAssets({ [characterType]: publicUrl });
+    if (characterType) {
+      if (characterType === 'plue' || characterType === 'beom') {
+        saveCharacterAssets({ [characterType]: publicUrl });
+      } else {
+        const { getCharacterAssets } = await import('@/lib/db');
+        const current = getCharacterAssets();
+        const customList = current.custom || [];
+        const updatedCustom = customList.map((c) =>
+          c.id === characterType ? { ...c, url: publicUrl } : c
+        );
+        if (!customList.some((c) => c.id === characterType)) {
+          updatedCustom.push({
+            id: characterType,
+            name: characterType,
+            url: publicUrl,
+            isFixed: false,
+          });
+        }
+        saveCharacterAssets({ custom: updatedCustom });
+      }
       console.log(`[Upload] Updated character asset for ${characterType}: ${publicUrl}`);
     }
 

@@ -49,16 +49,33 @@ export async function POST(request: NextRequest) {
     );
 
     // Kling Visual Sub-Agent: 9:16 비디오 생성
-    // 이미지 결정: 컷 개별 image_url 우선, 없으면 캐릭터 대표 에셋 사용
+    // 이미지 결정: 컷 개별 image_url 우선, 없으면 캐릭터 대표 에셋(플루, 범, 커스텀 캐릭터) 사용
     const characterAssets = getCharacterAssets();
     let referenceImageUrl: string | undefined = targetCut.image_url || undefined;
     if (!referenceImageUrl) {
-      if (targetCut.is_flashback && characterAssets.flashback) {
-        referenceImageUrl = characterAssets.flashback;
-      } else if (targetCut.speaker === 'plue' && characterAssets.plue) {
+      const speaker = targetCut.speaker?.toLowerCase();
+      if (speaker === 'plue' && characterAssets.plue) {
         referenceImageUrl = characterAssets.plue;
-      } else if (targetCut.speaker === 'beom' && characterAssets.beom) {
+      } else if (speaker === 'beom' && characterAssets.beom) {
         referenceImageUrl = characterAssets.beom;
+      } else if (characterAssets.custom && characterAssets.custom.length > 0) {
+        // 커스텀 등록된 캐릭터(예: '어흥이') 자동 매칭
+        const matched = characterAssets.custom.find(
+          (c) =>
+            c.id.toLowerCase() === speaker ||
+            c.name.toLowerCase() === speaker ||
+            (c.name && targetCut.script_text?.includes(c.name)) ||
+            (c.name && targetCut.visual_prompt?.includes(c.name)) ||
+            (c.id && targetCut.visual_prompt?.toLowerCase().includes(c.id.toLowerCase()))
+        );
+        if (matched && matched.url) {
+          referenceImageUrl = matched.url;
+        }
+      }
+
+      // 기본 폴백: 플루 대표 이미지
+      if (!referenceImageUrl && characterAssets.plue) {
+        referenceImageUrl = characterAssets.plue;
       }
     }
 

@@ -18,7 +18,7 @@ if (!globalStore.__characterAssets) {
   globalStore.__characterAssets = {
     plue: null,
     beom: null,
-    flashback: null,
+    custom: [],
   };
 }
 
@@ -26,7 +26,7 @@ const memoryEpisodes = globalStore.__memoryEpisodes;
 const memoryCuts = globalStore.__memoryCuts;
 
 export function getCharacterAssets(): CharacterAssets {
-  return globalStore.__characterAssets || { plue: null, beom: null, flashback: null };
+  return globalStore.__characterAssets || { plue: null, beom: null, custom: [] };
 }
 
 export async function fetchCharacterAssetsFromDB(): Promise<CharacterAssets> {
@@ -38,10 +38,17 @@ export async function fetchCharacterAssetsFromDB(): Promise<CharacterAssets> {
       .single();
 
     if (!error && data) {
+      let customList = [];
+      if (Array.isArray(data.custom)) {
+        customList = data.custom;
+      } else if (typeof data.custom === 'string') {
+        try { customList = JSON.parse(data.custom); } catch (e) {}
+      }
+
       globalStore.__characterAssets = {
         plue: data.plue || null,
         beom: data.beom || null,
-        flashback: data.flashback || null,
+        custom: customList,
       };
     }
   } catch (e) {}
@@ -50,27 +57,33 @@ export async function fetchCharacterAssetsFromDB(): Promise<CharacterAssets> {
 }
 
 export function saveCharacterAssets(assets: Partial<CharacterAssets>): CharacterAssets {
-  globalStore.__characterAssets = {
-    ...getCharacterAssets(),
+  const current = getCharacterAssets();
+  const merged: CharacterAssets = {
+    ...current,
     ...assets,
+    custom: assets.custom !== undefined ? assets.custom : (current.custom || []),
   };
+  globalStore.__characterAssets = merged;
 
   // 비동기 Supabase DB 영구 동기화
-  supabaseAdmin
-    .from('character_assets')
-    .upsert({
-      id: 'default',
-      plue: globalStore.__characterAssets.plue,
-      beom: globalStore.__characterAssets.beom,
-      flashback: globalStore.__characterAssets.flashback,
-      updated_at: new Date().toISOString(),
-    })
-    .then(({ error }) => {
-      if (error) console.warn('[DB] Character assets Supabase save warning:', error.message);
-    })
-    .catch(() => {});
+  (async () => {
+    try {
+      const { error } = await supabaseAdmin
+        .from('character_assets')
+        .upsert({
+          id: 'default',
+          plue: merged.plue,
+          beom: merged.beom,
+          custom: merged.custom || [],
+          updated_at: new Date().toISOString(),
+        });
+      if (error) {
+        console.warn('[DB] Character assets Supabase save warning:', error.message);
+      }
+    } catch (e) {}
+  })();
 
-  return globalStore.__characterAssets;
+  return merged;
 }
 
 export async function saveEpisodeAndCuts(
